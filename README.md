@@ -14,6 +14,8 @@ classroom demos. Two parts, use whichever fits the lesson:
 ## Quick start: the algorithm
 
 ```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r qrcode
 python3 totp_from_scratch.py
 ```
 
