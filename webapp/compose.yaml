@@ -1,0 +1,12 @@
+services:
+  totp:
+    # Looks for a Dockerfile in the current directory (.) to build the image
+    build: .
+    
+    # Maps port 8080 on your host computer to port 80 inside the container
+    ports:
+      - "8088:5000"
+    
+    # (Optional) Environment variables for your application
+    environment:
+      - NODE_ENV=development

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>You're in</h1>
+<div class="card">
+  <p class="success">Logged in as {{ username }} -- the code matched.</p>
+  <p>The server never stored or received a code in advance. It recomputed
+  the expected value from the shared secret and the current time, then
+  compared it to what you typed. That's the entire trust model.</p>
+</div>
+<p><a href="{{ url_for('logout') }}">Log out</a></p>
+{% endblock %}

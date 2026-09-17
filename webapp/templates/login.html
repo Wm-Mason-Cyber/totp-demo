@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Step 2 - Log in</h1>
+
+<div class="card">
+  <p>Enter the 6-digit code your authenticator app is showing right now.</p>
+  <form method="post">
+    <input type="text" name="code" inputmode="numeric" pattern="[0-9]*"
+           maxlength="6" autocomplete="one-time-code" autofocus required>
+    <button type="submit">Verify</button>
+  </form>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+</div>
+
+<div class="card">
+  <p>No phone in the room? Toggle this to watch the server compute the same
+  code your app would show (this is a classroom cheat, never expose this on
+  a real login page):</p>
+  <label><input type="checkbox" id="reveal"> show live code</label>
+  <p id="live" class="mono" style="display:none;"></p>
+</div>
+
+<script>
+  const checkbox = document.getElementById('reveal');
+  const live = document.getElementById('live');
+  let timer = null;
+
+  async function tick() {
+    const res = await fetch('/current-code');
+    const data = await res.json();
+    live.textContent = `${data.code}  (valid ${data.seconds_remaining}s)`;
+  }
+
+  checkbox.addEventListener('change', () => {
+    if (checkbox.checked) {
+      live.style.display = 'block';
+      tick();
+      timer = setInterval(tick, 1000);
+    } else {
+      live.style.display = 'none';
+      clearInterval(timer);
+    }
+  });
+</script>
+{% endblock %}
