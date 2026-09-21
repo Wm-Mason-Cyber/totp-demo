@@ -33,8 +33,35 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Then open http://localhost:5000, scan the QR code with Google Authenticator
-/ Authy / any TOTP app, and log in at `/login` with the code it shows.
+Then open http://localhost:5000. It's built to feel like a normal website
+(students should already be comfortable with the signup/login/save-password
+flow from the GPM demo), so there's no lesson text in the way:
+
+1. **Sign up** with a username and password, letting Google Password
+   Manager (or the student's own password manager) suggest and save it.
+2. **Set up two-factor**: scan the QR code, then type the first code to
+   finish. This page has iPhone / Android advice and other app suggestions.
+3. **Log in** with the password, then the current 6-digit code.
+
+The "what just happened" explanation appears on the success page, after
+students have done the real flow. For a student with no phone handy, add
+`?teacher=1` to the code page's URL (`/login/code?teacher=1`) to reveal a
+live-code toggle.
+
+Each student gets their own account and secret. Users live in memory and
+reset whenever the app restarts.
+
+**Phones:** students need to reach the site from their phone (same Wi-Fi,
+using your computer's IP address, e.g. `http://192.168.1.20:5000`).
+
+- **iPhone**: the built-in **Passwords** app is the native TOTP app. It
+  attaches the code to a *saved login*, which is why the demo has a real
+  signup step: tap **Save** when iOS offers, then scan the QR code with the
+  Camera app and pick that saved login. Google Authenticator (App Store)
+  also works if a student prefers it -- scan from *inside* that app.
+- **Android**: Google Authenticator (Play Store), scanning from inside the app.
+- The enroll page lists other apps too (Microsoft Authenticator, Authy,
+  2FAS, Aegis, Bitwarden, 1Password).
 
 ### Or with Docker
 
@@ -56,10 +83,12 @@ docker compose up --build -d
 - **A code is a moving target.** Unlike a password, a leaked TOTP code is
   only useful for ~30-60 seconds, which is the whole point of "something
   you have" (the phone with the secret) as a second factor.
-- **This demo is intentionally insecure for a real app**: one global
-  in-memory secret, no HTTPS, no rate limiting on `/login`, and a
-  `/current-code` endpoint that leaks the secret's output for
+- **Two factors, two steps.** Password alone never gets you in -- the
+  server only creates a full session after the code also matches.
+- **This demo is intentionally insecure for a real app**: in-memory users,
+  secrets stored in plaintext, no HTTPS, no rate limiting on the login
+  steps, and a `/current-code` endpoint that leaks the code for
   demonstration purposes. Good discussion prompt: *what's missing before
-  this could go live?* (Answers: per-user secrets in encrypted storage,
-  HTTPS, brute-force/rate limiting, secret delivered over a channel the
-  user already authenticated on, backup codes, etc.)
+  this could go live?* (Answers: secrets in encrypted storage, HTTPS,
+  brute-force/rate limiting, backup/recovery codes, rejecting a code
+  that was already used, etc.)
