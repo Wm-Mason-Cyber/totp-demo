@@ -40,8 +40,8 @@ Then open http://localhost:5000, scan the QR code with Google Authenticator
 
 ```bash
 cd webapp
-docker build -t totp-demo .
-docker run --rm -p 5000:5000 totp-demo
+docker compose up --build -d
+# uses port 8088
 ```
 
 ## What to point out in class
