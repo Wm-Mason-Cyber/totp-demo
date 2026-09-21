@@ -1,11 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>You're in</h1>
+<h1>You're signed in</h1>
 <div class="card">
-  <p class="success">Logged in as {{ username }} -- the code matched.</p>
-  <p>The server never stored or received a code in advance. It recomputed
-  the expected value from the shared secret and the current time, then
-  compared it to what you typed. That's the entire trust model.</p>
+  <p class="success">Welcome, {{ username }}. Your password and your code both matched.</p>
+  <p>Try it again: log out, then log in and notice how your phone helps with
+  both the password and the code.</p>
 </div>
-<p><a href="{{ url_for('logout') }}">Log out</a></p>
+
+<div class="card steps">
+  <strong>What just happened:</strong>
+  <ol>
+    <li>When you set up two-factor, the server generated a random secret just
+        for you and showed it as a QR code.</li>
+    <li>Scanning it handed that <em>same</em> secret to your phone.</li>
+    <li>Now both sides can independently compute the same 6-digit code every
+        30 seconds, because both know the secret <em>and</em> the current
+        time. The server never stored or received a code in advance -- it
+        recomputed the expected value and compared it to what you typed.</li>
+  </ol>
+  <p>Curious how the code is computed? See <code>totp_from_scratch.py</code>
+     in the project root.</p>
+</div>
 {% endblock %}

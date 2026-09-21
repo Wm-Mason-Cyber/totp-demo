@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Enter your code</h1>
+
+<div class="card">
+  <p>Signing in as <strong>{{ username }}</strong>. Enter the 6-digit code
+  your authenticator is showing right now.</p>
+  <form method="post">
+    <input class="code-input" type="text" name="code" inputmode="numeric"
+           pattern="[0-9]*" maxlength="6" autocomplete="one-time-code"
+           autofocus required>
+    <button type="submit">Verify</button>
+  </form>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <p class="hint">On iPhone, the code usually appears as a suggestion above
+  the keyboard -- tap it to fill it in.</p>
+</div>
+
+{% if teacher %}
+<div class="card">
+  <p>Teacher mode: watch the server compute the same code the app would show
+  (never expose this on a real login page):</p>
+  <label><input type="checkbox" id="reveal"> show live code</label>
+  <p id="live" class="mono" style="display:none;"></p>
+</div>
+
+<script>
+  const checkbox = document.getElementById('reveal');
+  const live = document.getElementById('live');
+  let timer = null;
+
+  async function tick() {
+    const res = await fetch('/current-code?teacher=1');
+    const data = await res.json();
+    live.textContent = `${data.code}  (valid ${data.seconds_remaining}s)`;
+  }
+
+  checkbox.addEventListener('change', () => {
+    if (checkbox.checked) {
+      live.style.display = 'block';
+      tick();
+      timer = setInterval(tick, 1000);
+    } else {
+      live.style.display = 'none';
+      clearInterval(timer);
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

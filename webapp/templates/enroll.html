@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Set up two-factor authentication</h1>
+
+<div class="card">
+  <p>Your account <strong>{{ username }}</strong> is created. Add a second
+  step to your login: scan this QR code with an authenticator on your phone,
+  then enter the code it shows to finish.</p>
+  <img class="qr" src="{{ qr }}" alt="Two-factor setup QR code" width="220">
+  <p class="hint">Can't scan? Enter this setup key in your app instead:</p>
+  <p class="mono">{{ secret }}</p>
+</div>
+
+<div class="card">
+  <div class="tabs">
+    <button type="button" class="tab-btn" data-tab="iphone">iPhone</button>
+    <button type="button" class="tab-btn" data-tab="android">Android</button>
+  </div>
+
+  <div class="tab-panel" data-panel="iphone" hidden>
+    <p><strong>Built in: the Passwords app.</strong> Nothing to install.</p>
+    <ol>
+      <li>Make sure this login is saved in Passwords. When you signed up, your
+          iPhone should have offered to save it -- if you tapped
+          <em>Not Now</em>, add it in the Passwords app first.</li>
+      <li>Open the <strong>Camera</strong> app and point it at the QR code.
+          Tap the banner that appears to set up a verification code.</li>
+      <li>When Passwords asks where to put it, choose the saved login for
+          this site (username <span class="mono">{{ username }}</span>).</li>
+      <li>Open that entry in Passwords: it now shows a 6-digit code that
+          refreshes every 30 seconds. Type it below.</li>
+    </ol>
+    <p class="hint">Camera won't work? In Passwords, open the saved login, tap
+    <em>Set Up Verification Code</em>, and choose <em>Enter Setup Key</em>,
+    then type the key shown above.</p>
+    <p>Prefer a separate app? Open <strong>Google Authenticator</strong>, tap
+    <strong>+</strong>, choose <strong>Scan a QR code</strong>, and scan from
+    inside the app.</p>
+    <a class="button"
+       href="https://apps.apple.com/app/google-authenticator/id388497605"
+       target="_blank" rel="noopener">Get Google Authenticator (App Store)</a>
+  </div>
+
+  <div class="tab-panel" data-panel="android" hidden>
+    <p><strong>Recommended: Google Authenticator.</strong></p>
+    <ol>
+      <li>Install it from the Play Store if you don't have it.</li>
+      <li>Open it, tap <strong>+</strong>, then <strong>Scan a QR code</strong>.</li>
+      <li>Point it at the code above, then type the 6-digit code it shows below.</li>
+    </ol>
+    <a class="button"
+       href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+       target="_blank" rel="noopener">Get Google Authenticator (Play Store)</a>
+  </div>
+</div>
+
+<div class="card">
+  <strong>Other apps that work:</strong>
+  <ul>
+    <li><a href="https://www.microsoft.com/en-us/security/mobile-authenticator-app" target="_blank" rel="noopener">Microsoft Authenticator</a></li>
+    <li><a href="https://authy.com/download/" target="_blank" rel="noopener">Authy</a></li>
+    <li><a href="https://2fas.com/" target="_blank" rel="noopener">2FAS</a></li>
+    <li><a href="https://getaegis.app/" target="_blank" rel="noopener">Aegis</a> (Android, open source)</li>
+    <li><a href="https://bitwarden.com/download/" target="_blank" rel="noopener">Bitwarden</a> or
+        <a href="https://1password.com/downloads/" target="_blank" rel="noopener">1Password</a> (password managers with built-in TOTP)</li>
+  </ul>
+  <p class="hint">Any app that supports "TOTP" or "time-based" codes will do.</p>
+</div>
+
+<div class="card">
+  <strong>Enter your code</strong>
+  <p>Type the 6-digit code your app is showing right now.</p>
+  <form method="post">
+    <input class="code-input" type="text" name="code" inputmode="numeric"
+           pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" required>
+    <button type="submit">Finish setup</button>
+  </form>
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+</div>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  function showTab(name) {
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    panels.forEach(p => { p.hidden = p.dataset.panel !== name; });
+  }
+
+  tabBtns.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  showTab(isAndroid ? 'android' : 'iphone');
+</script>
+{% endblock %}
